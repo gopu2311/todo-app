@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish To-Do App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 My To-Do List</h1>
+    <div class="todo-form">
+      <input type="text" id="todo-input" placeholder="Add a new task..." />
+      <button onclick="addTodo()">Add</button>
+    </div>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <script>
+    // Load all todos when page loads
+    window.onload = async () => {
+      const response = await fetch('/api/todos');
+      const todos = await response.json();
+      todos.forEach(renderTodo);
+    };
+
+    // Add new todo
+    async function addTodo() {
+      const input = document.getElementById('todo-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const res = await fetch('/api/todos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text })
+      });
+
+      if (res.ok) {
+        const newTodo = await res.json();
+        renderTodo(newTodo);
+        input.value = '';
+      } else {
+        alert('Failed to add task');
+      }
+    }
+
+    // Render a todo item
+    function renderTodo(todo) {
+      const li = document.createElement('li');
+      li.dataset.id = todo.id;
+      li.innerHTML = `
+        <span>${todo.text}</span>
+        <button onclick="deleteTodo(this)">✖</button>
+      `;
+      document.getElementById('todo-list').appendChild(li);
+    }
+
+    // Delete a todo item
+    async function deleteTodo(button) {
+      const li = button.parentElement;
+      const id = li.dataset.id;
+
+      const res = await fetch(`/api/todos/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        li.remove();
+      } else {
+        alert('Failed to delete task');
+      }
+    }
+  </script>
+</body>
+</html>

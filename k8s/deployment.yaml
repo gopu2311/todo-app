@@ -17,3 +17,11 @@ spec:
         image: gopu1234/note-apk:latest
         ports:
         - containerPort: 3000
+        volumeMounts:
+        - name: kubeconfig-volume
+          mountPath: /root/.kube/config 
+          subPath: kubeconfig
+      volumes:
+      - name: kubeconfig-volume
+        configMap:
+          name: kubeconfig

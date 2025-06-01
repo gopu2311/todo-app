@@ -43,7 +43,7 @@ resource "aws_security_group" "todo_app_sg" {
 }
 resource "aws_instance" "todo_app" {
   ami                         = "ami-0c55b159cbfafe1f0" 
-  instance_type               = "t2.micro"
+  instance_type               = "t3.small"
   key_name                    = aws_key_pair.deployer.key_name
   vpc_security_group_ids      = [aws_security_group.todo_sg.id]
   associate_public_ip_address = true
